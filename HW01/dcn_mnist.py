@@ -123,7 +123,27 @@ def main():
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name='accuracy')
 
     # Add a scalar summary for the snapshot loss.
-    tf.summary.scalar(cross_entropy.op.name, cross_entropy)
+    tf.summary.scalar("Cross Entropy (Loss)", cross_entropy)
+    
+    
+    # Add histogram summary for the weights
+    tf.summary.histogram("Conv Layer 1 Weight", W_conv1)
+    tf.summary.histogram("Conv Layer 1 Bias ", b_conv1)
+    tf.summary.histogram("Conv Layer 1 Activation", h_conv1)
+    tf.summary.histogram("Conv Layer 1 Pool", h_pool1)
+    tf.summary.histogram("Conv Layer 2 Weight", W_conv2)
+    tf.summary.histogram("Conv Layer 2 Bias", b_conv2)
+    tf.summary.histogram("Conv Layer 2 Activation", h_conv2)
+    tf.summary.histogram("Conv Layer 2 Pool", h_pool2)
+    tf.summary.histogram("FullConnect_1 Weight", W_fc1)
+    tf.summary.histogram("FullConnect_1 Bias", b_fc1)
+    tf.summary.histogram("FullConnect_1 Activation", h_fc1)
+    tf.summary.histogram("FullConnect_2 Weight", W_fc2)
+    tf.summary.histogram("FullConnect_2 Bias", b_fc2)
+    
+    tf.summary.histogram("Output", y)
+    
+    
     # Build the summary operation based on the TF collection of Summaries.
     summary_op = tf.summary.merge_all()
 
@@ -159,6 +179,15 @@ def main():
         if i % 1100 == 0 or i == max_step:
             checkpoint_file = os.path.join(result_dir, 'checkpoint')
             saver.save(sess, checkpoint_file, global_step=i)
+            
+            
+            
+            print("Test Validation Accuracy: %g" % accuracy.eval(feed_dict={
+                x: mnist.validation.images,
+                y_: mnist.validation.labels, keep_prob: 1.0}))
+            # print test error
+            print("Test Accuracy %g:" % accuracy.eval(feed_dict={
+                x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
         train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5}) # run one train_step
 

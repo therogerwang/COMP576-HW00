@@ -154,9 +154,7 @@ class NeuralNetwork(object):
         # Calculating the loss
 
         # YOU IMPLEMENT YOUR CALCULATION OF THE LOSS HERE
-
-
-        data_loss = -1* np.sum(np.log(self.probs[range(num_examples), y]))
+        data_loss = -1 * np.sum(np.log(self.probs[range(num_examples), y]))
 
         # Add regulatization term to loss (optional)
         data_loss += self.reg_lambda / 2 * (np.sum(np.square(self.W1)) + np.sum(np.square(self.W2)))
@@ -183,11 +181,14 @@ class NeuralNetwork(object):
         num_examples = len(X)
         delta3 = self.probs
         delta3[range(num_examples), y] -= 1
-        # dW2 = a.T*
-        # db2 = dL/db2
-        # dW1 = dL/dW1
-        # db1 = dL/db1
-        # return dW1, dW2, db1, db2
+        delta2 = self.diff_actFun(self.z1, type=self.actFun_type) * np.dot(delta3, self.W2.T)
+        
+        # calculate derivatives
+        dW2 = np.dot(self.a1.T, delta3)
+        db2 = np.sum(delta3, axis=0)
+        dW1 = np.dot(X.T, delta2)
+        db1 = np.sum(delta2, axis=0)
+        return dW1, dW2, db1, db2
 
 
 
