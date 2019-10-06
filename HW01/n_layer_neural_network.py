@@ -3,6 +3,16 @@ from sklearn import datasets, linear_model
 import matplotlib.pyplot as plt
 from HW01 import three_layer_neural_network
 
+def generate_data():
+    '''
+    generate data
+    :return: X: input data, y: given labels
+    '''
+    np.random.seed(0)
+    X, y = datasets.make_gaussian_quantiles(n_features=2, n_classes=3)
+    return X, y
+
+
 class Layer(object):
     """
     Single layer of the n-layer network
@@ -186,14 +196,14 @@ class DeepNeuralNetwork(three_layer_neural_network.NeuralNetwork):
 
 def main():
     # # generate and visualize Make-Moons dataset
-    X, y = three_layer_neural_network.generate_data()
+    X, y = generate_data()
     num_samples, data_dimension = X.shape
     
-    layer_sizes = [data_dimension, 25, 2]
+    layer_sizes = [data_dimension, 30, 15, 5, 3]
     layer_num = len(layer_sizes)
     
     #  start the deep neural network
-    model = DeepNeuralNetwork(layer_num, layer_sizes, actFun_type='relu')
+    model = DeepNeuralNetwork(layer_num, layer_sizes, actFun_type='sigmoid')
 
     model.fit_model(X, y)
     model.visualize_decision_boundary(X, y)
