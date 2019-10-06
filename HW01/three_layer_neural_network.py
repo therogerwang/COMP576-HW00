@@ -70,6 +70,9 @@ class NeuralNetwork(object):
         self.W2 = np.random.randn(self.nn_hidden_dim, self.nn_output_dim) / np.sqrt(self.nn_hidden_dim)
         self.b2 = np.zeros((1, self.nn_output_dim))
 
+    # @staticmethod
+    # def actFun(z, type):
+    
     def actFun(self, z, type):
         '''
         actFun computes the activation functions
@@ -236,11 +239,6 @@ class NeuralNetwork(object):
 
 
 
-class DeepNeuralNetwork(NeuralNetwork):
-    def __init__(self, nn_input_dim, nn_hidden_dim, nn_output_dim, actFun_type='tanh', reg_lambda=0.01, seed=0):
-        super().__init__()
-
-
 def main():
 
 
@@ -249,7 +247,7 @@ def main():
     plt.scatter(X[:, 0], X[:, 1], s=40, c=y, cmap=plt.cm.Spectral)
     plt.show()
 
-    model = NeuralNetwork(nn_input_dim=2, nn_hidden_dim=3 , nn_output_dim=2, actFun_type='tanh')
+    model = NeuralNetwork(nn_input_dim=2, nn_hidden_dim=3 , nn_output_dim=2, actFun_type='relu')
     model.fit_model(X,y)
     model.visualize_decision_boundary(X,y)
 
