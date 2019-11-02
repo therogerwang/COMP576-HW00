@@ -119,25 +119,38 @@ h_conv1 = tf.nn.relu(conv2d(tf_data, W_conv1) + b_conv1)
 
 
 #Max layer subsampling by 2
-h_pool1 = max_pool_2x2(h_conv1)
+pool1 = max_pool_2x2(h_conv1)
 
 #drop random set of activations to prevent overfitting
-h_pool1 = tf.nn.dropout(h_pool1, tf.placeholder(tf.float32))
+pool1 = tf.nn.dropout(pool1, tf.placeholder(tf.float32))
 
 
 #Conv layer 2 with 5x5 kernel, 64 filter maps, followed by ReLU
 W_conv2 = weight_variable([5, 5, 32, 64])
 b_conv2 = bias_variable([64])
-h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+h_conv2 = tf.nn.relu(conv2d(pool1, W_conv2) + b_conv2)
 
 #Max layer subsampling by 2
-h_pool2 = max_pool_2x2(h_conv2)
+pool2 = max_pool_2x2(h_conv2)
 
 #drop random set of activations to prevent overfitting
-h_pool2 = tf.nn.dropout(h_pool2, tf.placeholder(tf.float32))
+pool2 = tf.nn.dropout(pool2, tf.placeholder(tf.float32))
 
 # Fully Connected layer with 7x7x64 input and output 1024
 
+#initialize weights/biases
+W_fc1 = weight_variable([7*7*64, 1024])
+b_fc1 = bias_variable([1024])
+
+#apply to 2nd pool
+pool2 = tf.reshape(pool2, [-1, 7*7*64])
+h_fc1 = tf.nn.relu(tf.matmul(pool2, W_fc1) + b_fc1)
+
+# Fully Connected layer with 1024 input and output 10
+
+W_fc2 = weight_variable([1024, 10])
+b_fc2 = bias_variable([10])
+model_result = tf.matmul(h_fc1, W_fc2) + b_fc2
 
 # --------------------------------------------------
 # loss
