@@ -72,12 +72,12 @@ def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 
-ntrain =  # per class
-ntest =  # per class
-nclass =  # number of classes
-imsize =
-nchannels =
-batchsize =
+ntrain = 1000 # training images per class
+ntest = 100 # testing images per class
+nclass = 10 # number of classes
+imsize = 28
+nchannels = 1
+batchsize = 128
 
 Train = np.zeros((ntrain * nclass, imsize, imsize, nchannels))
 Test = np.zeros((ntest * nclass, imsize, imsize, nchannels))
@@ -88,15 +88,15 @@ itrain = -1
 itest = -1
 for iclass in range(0, nclass):
     for isample in range(0, ntrain):
-        path = '~/CIFAR10/Train/%d/Image%05d.png' % (iclass, isample)
-        im = misc.imread(path);  # 28 by 28
+        path = 'CIFAR10/Train/%d/Image%05d.png' % (iclass, isample)
+        im = misc.imread(path)  # 28 by 28
         im = im.astype(float) / 255
         itrain += 1
         Train[itrain, :, :, 0] = im
         LTrain[itrain, iclass] = 1  # 1-hot lable
     for isample in range(0, ntest):
-        path = '~/CIFAR10/Test/%d/Image%05d.png' % (iclass, isample)
-        im = misc.imread(path);  # 28 by 28
+        path = 'CIFAR10/Test/%d/Image%05d.png' % (iclass, isample)
+        im = misc.imread(path)  # 28 by 28
         im = im.astype(float) / 255
         itest += 1
         Test[itest, :, :, 0] = im
@@ -104,8 +104,9 @@ for iclass in range(0, nclass):
 
 sess = tf.InteractiveSession()
 
-tf_data =  # tf variable for the data, remember shape is [None, width, height, numberOfChannels]
-tf_labels =  # tf variable for labels
+tf_data =  tf.placeholder(tf.float32, shape=[None, imsize, imsize, nchannels]) # tf variable for the data, remember shape is [None, width, height, numberOfChannels]
+tf_labels = tf.placeholder(tf.float32, shape=[None, nclass]) # tf variable for labels
+
 
 # --------------------------------------------------
 # model
@@ -115,27 +116,27 @@ tf_labels =  # tf variable for labels
 # loss
 # set up the loss, optimization, evaluation, and accuracy
 
-
-# --------------------------------------------------
-# optimization
-
-sess.run(tf.initialize_all_variables())
-batch_xs =  # setup as [batchsize, width, height, numberOfChannels] and use np.zeros()
-batch_ys =  # setup as [batchsize, the how many classes]
-for i in range():  # try a small iteration size once it works then continue
-    perm = np.arange(nsamples)
-    np.random.shuffle(perm)
-    for j in range(batchsize):
-        batch_xs[j, :, :, :] = Train[perm[j], :, :, :]
-        batch_ys[j, :] = LTrain[perm[j], :]
-    if i % 10 == 0:
-    # calculate train accuracy and print it
-    optimizer.run(feed_dict={})  # dropout only during training
-
-# --------------------------------------------------
-# test
-
-
-print("test accuracy %g" % accuracy.eval(feed_dict={tf_data: Test, tf_labels: LTest, keep_prob: 1.0}))
-
-sess.close()
+#
+# # --------------------------------------------------
+# # optimization
+#
+# sess.run(tf.initialize_all_variables())
+# batch_xs =  # setup as [batchsize, width, height, numberOfChannels] and use np.zeros()
+# batch_ys =  # setup as [batchsize, the how many classes]
+# for i in range():  # try a small iteration size once it works then continue
+#     perm = np.arange(nsamples)
+#     np.random.shuffle(perm)
+#     for j in range(batchsize):
+#         batch_xs[j, :, :, :] = Train[perm[j], :, :, :]
+#         batch_ys[j, :] = LTrain[perm[j], :]
+#     if i % 10 == 0:
+#     # calculate train accuracy and print it
+#     optimizer.run(feed_dict={})  # dropout only during training
+#
+# # --------------------------------------------------
+# # test
+#
+#
+# print("test accuracy %g" % accuracy.eval(feed_dict={tf_data: Test, tf_labels: LTest, keep_prob: 1.0}))
+#
+# sess.close()
