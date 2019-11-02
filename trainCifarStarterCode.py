@@ -112,31 +112,58 @@ tf_labels = tf.placeholder(tf.float32, shape=[None, nclass]) # tf variable for l
 # model
 # create your model
 
+#Conv layer 1 with 5x5 kernel, 32 filter maps, followed by ReLU
+W_conv1 = weight_variable([5, 5, 1, 32])
+b_conv1 = bias_variable([32])
+h_conv1 = tf.nn.relu(conv2d(tf_data, W_conv1) + b_conv1)
+
+
+#Max layer subsampling by 2
+h_pool1 = max_pool_2x2(h_conv1)
+
+#drop random set of activations to prevent overfitting
+h_pool1 = tf.nn.dropout(h_pool1, tf.placeholder(tf.float32))
+
+
+#Conv layer 2 with 5x5 kernel, 64 filter maps, followed by ReLU
+W_conv2 = weight_variable([5, 5, 32, 64])
+b_conv2 = bias_variable([64])
+h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+
+#Max layer subsampling by 2
+h_pool2 = max_pool_2x2(h_conv2)
+
+#drop random set of activations to prevent overfitting
+h_pool2 = tf.nn.dropout(h_pool2, tf.placeholder(tf.float32))
+
+# Fully Connected layer with 7x7x64 input and output 1024
+
+
 # --------------------------------------------------
 # loss
 # set up the loss, optimization, evaluation, and accuracy
 
-#
-# # --------------------------------------------------
-# # optimization
-#
-# sess.run(tf.initialize_all_variables())
-# batch_xs =  # setup as [batchsize, width, height, numberOfChannels] and use np.zeros()
-# batch_ys =  # setup as [batchsize, the how many classes]
-# for i in range():  # try a small iteration size once it works then continue
-#     perm = np.arange(nsamples)
-#     np.random.shuffle(perm)
-#     for j in range(batchsize):
-#         batch_xs[j, :, :, :] = Train[perm[j], :, :, :]
-#         batch_ys[j, :] = LTrain[perm[j], :]
-#     if i % 10 == 0:
-#     # calculate train accuracy and print it
-#     optimizer.run(feed_dict={})  # dropout only during training
-#
-# # --------------------------------------------------
-# # test
-#
-#
-# print("test accuracy %g" % accuracy.eval(feed_dict={tf_data: Test, tf_labels: LTest, keep_prob: 1.0}))
-#
-# sess.close()
+
+# --------------------------------------------------
+# optimization
+
+sess.run(tf.initialize_all_variables())
+batch_xs =  # setup as [batchsize, width, height, numberOfChannels] and use np.zeros()
+batch_ys =  # setup as [batchsize, the how many classes]
+for i in range():  # try a small iteration size once it works then continue
+    perm = np.arange(nsamples)
+    np.random.shuffle(perm)
+    for j in range(batchsize):
+        batch_xs[j, :, :, :] = Train[perm[j], :, :, :]
+        batch_ys[j, :] = LTrain[perm[j], :]
+    if i % 10 == 0:
+    # calculate train accuracy and print it
+    optimizer.run(feed_dict={})  # dropout only during training
+
+# --------------------------------------------------
+# test
+
+
+print("test accuracy %g" % accuracy.eval(feed_dict={tf_data: Test, tf_labels: LTest, keep_prob: 1.0}))
+
+sess.close()
