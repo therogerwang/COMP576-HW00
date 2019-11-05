@@ -1,19 +1,21 @@
+#Roger Wang - ryw3 - COMP576
+
 import tensorflow as tf
 from tensorflow.python.ops import rnn, rnn_cell
 import numpy as np
 
 from tensorflow.examples.tutorials.mnist import input_data
-
+import matplotlib.pyplot as plt
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True) #call mnist function
 
 learningRate = .001
-trainingIters = 2000
-batchSize = 128
-displayStep = 100
+trainingIters = 100001
+batchSize = 100
+displayStep = 20 #in batch sizes
 
 nInput = 28 #we want the input to take the 28 pixels
 nSteps = 28 #every 28
-nHidden = 128 #number of neurons for the RNN
+nHidden = 32 #number of neurons for the RNN
 nClasses = 10 #this is MNIST so you know
 
 x = tf.placeholder('float', [None, nSteps, nInput])
@@ -28,9 +30,10 @@ biases = {
 }
 
 def RNN(x, weights, biases):
-	x = tf.transpose(x, [1,0,2])
+	# configuring so you can get it as needed for the 28 pixels
+	x = tf.transpose(x, [1, 0, 2])
 	x = tf.reshape(x, [-1, nInput])
-	x = tf.split(0, nSteps, x) #configuring so you can get it as needed for the 28 pixels
+	x = tf.split(x, nSteps, 0)  # configuring so you can get it as needed for the 28 pixels
 
 	lstmCell = rnn_cell.BasicRNNCell(nHidden)  #find which lstm to use in the documentation
 
@@ -51,10 +54,19 @@ accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
 
 init = tf.initialize_all_variables()
 
+
+epochs = []
+train_acc_list = []
+test_acc_list = []
+loss_list = []
+
 with tf.Session() as sess:
 	sess.run(init)
 	step = 1
-
+	testData = mnist.test.images.reshape((-1, nSteps, nInput))
+	testLabel = mnist.test.labels
+	
+	
 	while step* batchSize < trainingIters:
 		batchX, batchY = mnist.train.next_batch(batchSize)#mnist has a way to get the next batch
 		batchX = batchX.reshape((batchSize, nSteps, nInput))
@@ -62,15 +74,36 @@ with tf.Session() as sess:
 		sess.run(optimizer, feed_dict={x: batchX, y: batchY})
 
 		if step % displayStep == 0:
-			acc =
-			loss =
+			acc = accuracy.eval(feed_dict={x: batchX, y: batchY})
+			loss =cost.eval(feed_dict={x: batchX, y: batchY})
 			print("Iter " + str(step*batchSize) + ", Minibatch Loss= " + \
-                  "{:.6f}".format() + ", Training Accuracy= " + \
-                  "{:.5f}".format())
+                  "{:.6f}".format(loss) + ", Training Accuracy= " + \
+                  "{:.5f}".format(acc))
+			
+			
+			loss_list.append(loss)
+			train_acc_list.append(acc)
+			epochs.append(step*batchSize)
+			test_acc_list.append(sess.run(accuracy, feed_dict={x: testData, y: testLabel}))
 		step +=1
 	print('Optimization finished')
 
-	testData = mnist.test.images.reshape((-1, nSteps, nInput))
-	testLabel = mnist.test.labels
 	print("Testing Accuracy:", \
-        sess.run(accuracy, feed_dict={}))
+        sess.run(accuracy, feed_dict={x: testData, y: testLabel}))
+	
+	
+# Plot train/test accuracy and training loss
+plt.title("RNN Accuracy/Loss")
+plt.grid()
+plt.xlabel('Iteration')
+plt.ylabel('Accuracy')
+plt.ylim(0, 1)
+plt.plot(epochs, train_acc_list, label='Training Accuracy')
+plt.plot(epochs, test_acc_list, label='Test Accuracy')
+plt.legend(loc='upper right')
+ax2 = plt.twinx()
+ax2.plot(epochs, loss_list, 'k', label='Loss')
+ax2.legend(loc='upper left')
+ax2.set_ylabel('Loss')
+
+plt.show()
